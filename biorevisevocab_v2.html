@@ -1,0 +1,436 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.scr{padding:1.25rem 0;max-width:660px;display:none}
+.scr.active{display:block}
+h1{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+h2{font-size:18px;font-weight:500;color:var(--color-text-primary)}
+h3{font-size:16px;font-weight:500;color:var(--color-text-primary)}
+p{font-size:14px;color:var(--color-text-secondary);line-height:1.6}
+.btn{display:inline-block;padding:9px 20px;font-size:14px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;color:var(--color-text-primary);cursor:pointer;font-family:var(--font-sans);transition:background 0.15s}
+.btn:hover{background:var(--color-background-secondary)}
+.btn-green{background:#1D9E75;color:#E1F5EE;border-color:#0F6E56}
+.btn-green:hover{background:#0F6E56}
+.btn-purple{background:#7F77DD;color:#EEEDFE;border-color:#534AB7}
+.btn-purple:hover{background:#534AB7}
+.btn-amber{background:#BA7517;color:#FAEEDA;border-color:#854F0B}
+.btn-sm{padding:6px 14px;font-size:13px}
+.btn:disabled{opacity:0.4;cursor:not-allowed}
+input{width:100%;padding:9px 12px;font-size:14px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);font-family:var(--font-sans);margin-bottom:10px;outline:none}
+input:focus{border-color:#7F77DD}
+.pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500}
+.pill-green{background:#E1F5EE;color:#085041}
+.pill-amber{background:#FAEEDA;color:#633806}
+.pill-gray{background:#F1EFE8;color:#444441}
+.pill-blue{background:#E6F1FB;color:#0C447C}
+.xp-track{height:8px;background:var(--color-background-secondary);border-radius:4px;overflow:hidden;margin:6px 0}
+.xp-fill{height:100%;border-radius:4px;transition:width 0.5s ease}
+.err{font-size:13px;color:#A32D2D;min-height:18px;margin-top:2px}
+.info-note{font-size:12px;color:var(--color-text-secondary);background:var(--color-background-secondary);padding:8px 12px;border-radius:var(--border-radius-md);margin-top:12px;line-height:1.5}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem}
+.section-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:1rem 0}
+.sec-card{padding:1rem;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);cursor:pointer;transition:border-color 0.15s,background 0.15s;position:relative}
+.sec-card:hover:not(.locked){border-color:#7F77DD;background:#EEEDFE}
+.sec-card.locked{opacity:0.5;cursor:not-allowed}
+.sec-card.complete{border-color:#1D9E75;background:#E1F5EE}
+.sec-title{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px}
+.sec-sub{font-size:11px;color:var(--color-text-secondary)}
+.sec-badge{position:absolute;top:8px;right:8px;font-size:16px}
+.stage-row{display:flex;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap}
+.stage-pip{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;background:var(--color-background-secondary);color:var(--color-text-secondary)}
+.stage-pip.done{background:#E1F5EE;color:#085041}
+.stage-pip.cur{background:#EEEDFE;color:#3C3489;border:1.5px solid #7F77DD}
+.flashcard-wrap{perspective:1000px;margin:1rem 0}
+.flashcard{width:100%;min-height:200px;position:relative;transform-style:preserve-3d;transition:transform 0.5s ease;cursor:pointer}
+.flashcard.flipped{transform:rotateY(180deg)}
+.fc-face{position:absolute;width:100%;min-height:200px;backface-visibility:hidden;border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:center;padding:1.5rem;text-align:center}
+.fc-front{background:var(--color-background-primary)}
+.fc-back{background:#EEEDFE;transform:rotateY(180deg)}
+.fc-term{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+.fc-def{font-size:14px;color:#3C3489;line-height:1.7}
+.fc-hint{font-size:12px;color:var(--color-text-secondary);margin-top:12px}
+.fc-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:8px}
+.fc-nav{display:flex;justify-content:space-between;align-items:center;margin-top:1rem}
+.know-row{display:flex;gap:8px;justify-content:center;margin-top:1rem}
+.prog-bar{height:6px;background:var(--color-background-secondary);border-radius:3px;margin-bottom:1rem;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;transition:width 0.3s}
+
+/* MATCH — fixed layout */
+.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:1rem 0;align-items:start}
+.match-col{display:flex;flex-direction:column;gap:8px}
+.match-col-label{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px}
+.match-item{padding:10px 14px;border-radius:var(--border-radius-md);border:1.5px solid var(--color-border-tertiary);background:var(--color-background-primary);cursor:pointer;font-size:13px;color:var(--color-text-primary);line-height:1.4;transition:all 0.15s;min-height:44px;display:flex;align-items:center;user-select:none}
+.match-item.term-item{font-weight:500}
+.match-item:hover:not(.matched):not(.disabled-item){border-color:#7F77DD;background:#EEEDFE}
+.match-item.selected{border-color:#7F77DD!important;background:#EEEDFE!important;border-width:2px}
+.match-item.matched{border-color:#1D9E75!important;background:#E1F5EE!important;color:#085041;cursor:default}
+.match-item.wrong-flash{border-color:#E24B4A!important;background:#FCEBEB!important;animation:shake 0.35s ease}
+.match-item.disabled-item{opacity:0.35;cursor:not-allowed;pointer-events:none}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.ma-status{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;flex-wrap:wrap;gap:8px}
+
+/* FTG */
+.ftg-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem;margin-bottom:1rem}
+.ftg-sentence{font-size:15px;color:var(--color-text-primary);line-height:2;margin-bottom:1rem}
+.ftg-blank{display:inline-block;min-width:130px;border-bottom:2px solid #7F77DD;padding:0 8px;font-weight:500;color:#534AB7;text-align:center;vertical-align:bottom}
+.ftg-options{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.ftg-opt{padding:7px 14px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);cursor:pointer;font-size:13px;color:var(--color-text-primary);transition:all 0.15s}
+.ftg-opt:hover:not(.used){border-color:#7F77DD;background:#EEEDFE}
+.ftg-opt.correct-pick{border-color:#1D9E75!important;background:#E1F5EE!important;color:#085041}
+.ftg-opt.wrong-pick{border-color:#E24B4A!important;background:#FCEBEB!important;color:#791F1F}
+.ftg-opt.used{opacity:0.4;cursor:not-allowed;pointer-events:none}
+.ftg-fb{font-size:13px;padding:8px 12px;border-radius:var(--border-radius-md);margin-top:8px;min-height:20px}
+.ftg-fb-ok{background:#E1F5EE;color:#085041}
+.ftg-fb-no{background:#FCEBEB;color:#791F1F}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:1rem 0}
+.stat-box{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px;text-align:center}
+.stat-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:2px}
+.stat-val{font-size:20px;font-weight:500;color:var(--color-text-primary)}
+.gate-box{padding:1.25rem;border-radius:var(--border-radius-lg);border:2px solid #BA7517;background:#FAEEDA;text-align:center;margin:1rem 0}
+</style>
+
+<!-- LOGIN -->
+<div id="s-login" class="scr active">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+    <div style="width:36px;height:36px;border-radius:50%;background:#EEEDFE;display:flex;align-items:center;justify-content:center;font-size:18px">🧬</div>
+    <h1>BioRevise</h1>
+  </div>
+  <p style="margin-bottom:1.5rem">IGCSE Biology · Topic 1 Vocab Builder</p>
+  <div class="card" style="max-width:380px">
+    <h3 style="margin-bottom:1rem">Sign in or create account</h3>
+    <label style="font-size:12px;color:var(--color-text-secondary);display:block;margin-bottom:4px">Username</label>
+    <input id="lu" placeholder="e.g. alex2026" autocomplete="off"/>
+    <label style="font-size:12px;color:var(--color-text-secondary);display:block;margin-bottom:4px">PIN (4 digits)</label>
+    <input id="lp" type="password" placeholder="••••" maxlength="4"/>
+    <div class="err" id="lerr"></div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn btn-green" onclick="doLogin()">sign in</button>
+      <button class="btn btn-purple" onclick="doReg()">create account</button>
+    </div>
+    <div class="info-note">Work through all 8 vocab sections to unlock the quiz. Progress saves on this device.</div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="s-dash" class="scr">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.25rem;flex-wrap:wrap;gap:8px">
+    <div><h1 id="d-hello">Hey!</h1><p id="d-sub"></p></div>
+    <button class="btn btn-sm" onclick="doLogout()">sign out</button>
+  </div>
+  <div style="margin-bottom:1rem">
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+      <span style="font-size:13px;color:var(--color-text-secondary)">Vocab progress</span>
+      <span style="font-size:13px;font-weight:500;color:var(--color-text-primary)" id="d-prog-label">0 / 8 sections</span>
+    </div>
+    <div class="xp-track"><div class="xp-fill" id="d-prog-bar" style="width:0%;background:#7F77DD"></div></div>
+  </div>
+  <div style="padding:12px 16px;border-radius:var(--border-radius-lg);background:var(--color-background-secondary);margin-bottom:1.25rem;font-size:13px;color:var(--color-text-secondary);line-height:1.6">
+    Complete all 3 stages in each section to unlock the next. Finish all 8 sections to unlock the multiple choice quiz.
+  </div>
+  <h2 style="margin-bottom:1rem">Sections</h2>
+  <div class="section-grid" id="section-grid"></div>
+</div>
+
+<!-- SECTION HOME -->
+<div id="s-section" class="scr">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
+    <div><h2 id="sec-title">Life processes</h2><p id="sec-sub"></p></div>
+    <button class="btn btn-sm" onclick="showDash()">← back</button>
+  </div>
+  <div class="stage-row" id="stage-row"></div>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <button class="btn btn-green" id="stage1-btn" onclick="startStage(1)">📖 Stage 1 — Explore flashcards</button>
+    <button class="btn" id="stage2-btn" onclick="startStage(2)">🔗 Stage 2 — Match terms and definitions</button>
+    <button class="btn" id="stage3-btn" onclick="startStage(3)">✏️ Stage 3 — Fill the gap (65% to pass)</button>
+  </div>
+  <div id="sec-complete-msg" style="display:none;margin-top:1rem;padding:1rem;background:#E1F5EE;border-radius:var(--border-radius-lg);border:0.5px solid #1D9E75;text-align:center">
+    <div style="font-size:28px;margin-bottom:6px">✅</div>
+    <div style="font-size:14px;font-weight:500;color:#085041">Section complete!</div>
+    <div style="font-size:13px;color:#0F6E56;margin-top:4px" id="sec-next-msg"></div>
+  </div>
+</div>
+
+<!-- STAGE 1: FLASHCARDS -->
+<div id="s-flash" class="scr">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+    <div><h2 id="fl-title">Flashcards</h2><p id="fl-sub" style="font-size:12px"></p></div>
+    <button class="btn btn-sm" onclick="showSection()">← back</button>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" id="fl-prog" style="width:0%;background:#7F77DD"></div></div>
+  <div class="flashcard-wrap">
+    <div class="flashcard" id="flashcard" onclick="flipCard()">
+      <div class="fc-face fc-front">
+        <div><div class="fc-label" id="fc-label-front"></div><div class="fc-term" id="fc-term"></div><div class="fc-hint" style="margin-top:12px">tap to reveal definition →</div></div>
+      </div>
+      <div class="fc-face fc-back">
+        <div><div class="fc-label" id="fc-label-back" style="color:#534AB7"></div><div class="fc-def" id="fc-def"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="fc-nav">
+    <button class="btn btn-sm" id="fl-prev" onclick="fcNav(-1)">← prev</button>
+    <span style="font-size:13px;color:var(--color-text-secondary)" id="fl-count">1 / 10</span>
+    <button class="btn btn-sm" id="fl-next" onclick="fcNav(1)">next →</button>
+  </div>
+  <div class="know-row">
+    <button class="btn btn-sm" onclick="markKnow(false)" style="border-color:#E24B4A;color:#A32D2D">🤔 still learning</button>
+    <button class="btn btn-sm btn-green" onclick="markKnow(true)">✓ got it</button>
+  </div>
+  <div style="margin-top:1rem;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+    <span class="pill pill-green" id="fl-known-count">0 known</span>
+    <span class="pill pill-amber" id="fl-unknown-count">0 still learning</span>
+  </div>
+  <div style="margin-top:1.25rem;text-align:center">
+    <button class="btn btn-green" onclick="finishFlash()">Done exploring → go to Stage 2</button>
+  </div>
+</div>
+
+<!-- STAGE 2: MATCH-UP -->
+<div id="s-match" class="scr">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+    <div><h2 id="ma-title">Match-up</h2><p id="ma-sub" style="font-size:12px"></p></div>
+    <button class="btn btn-sm" onclick="showSection()">← back</button>
+  </div>
+  <div style="font-size:13px;color:var(--color-text-secondary);padding:10px 14px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);margin-bottom:1rem">
+    Click a <strong>term</strong> on the left, then its matching <strong>definition</strong> on the right. They will lock green when correct.
+  </div>
+  <div class="ma-status">
+    <span class="pill pill-green" id="ma-matched">0 / 6 matched</span>
+    <span class="pill pill-amber" id="ma-round-label">Round 1</span>
+    <span class="pill pill-gray" id="ma-errors">0 errors</span>
+  </div>
+  <div class="match-grid">
+    <div>
+      <div class="match-col-label">Terms</div>
+      <div class="match-col" id="ma-terms"></div>
+    </div>
+    <div>
+      <div class="match-col-label">Definitions</div>
+      <div class="match-col" id="ma-defs"></div>
+    </div>
+  </div>
+  <div id="ma-result" style="display:none;margin-top:1rem;text-align:center;padding:1.25rem;background:var(--color-background-secondary);border-radius:var(--border-radius-lg)">
+    <div style="font-size:32px;margin-bottom:8px" id="ma-result-icon"></div>
+    <p id="ma-result-msg" style="margin-bottom:1rem"></p>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-green" id="ma-next-btn" onclick="nextMatchRound()"></button>
+      <button class="btn btn-sm" onclick="resetMatch()">shuffle &amp; retry</button>
+    </div>
+  </div>
+</div>
+
+<!-- STAGE 3: FILL THE GAP -->
+<div id="s-ftg" class="scr">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+    <div><h2 id="ftg-title">Fill the gap</h2><p id="ftg-sub" style="font-size:12px"></p></div>
+    <button class="btn btn-sm" onclick="showSection()">← back</button>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" id="ftg-prog" style="width:0%;background:#BA7517"></div></div>
+  <div style="display:flex;justify-content:space-between;margin-bottom:1rem">
+    <span class="pill pill-amber" id="ftg-count">Q1 of 10</span>
+    <span class="pill pill-green" id="ftg-score">Score: 0</span>
+  </div>
+  <div class="ftg-card" id="ftg-card"></div>
+  <div id="ftg-result" style="display:none;margin-top:1rem">
+    <div style="text-align:center;padding:1rem 0">
+      <div style="font-size:36px;margin-bottom:8px" id="ftg-result-icon"></div>
+      <h3 id="ftg-result-title"></h3>
+      <p id="ftg-result-msg" style="margin-top:6px"></p>
+    </div>
+    <div class="stat-row">
+      <div class="stat-box"><div class="stat-label">Correct</div><div class="stat-val" id="ftg-r-correct">0</div></div>
+      <div class="stat-box"><div class="stat-label">Score</div><div class="stat-val" id="ftg-r-pct">0%</div></div>
+      <div class="stat-box"><div class="stat-label">Pass mark</div><div class="stat-val">65%</div></div>
+      <div class="stat-box"><div class="stat-label">Result</div><div class="stat-val" id="ftg-r-result"></div></div>
+    </div>
+    <div id="ftg-gate" class="gate-box" style="display:none">
+      <div style="font-size:28px;margin-bottom:8px">🔒</div>
+      <h3 style="margin-bottom:6px">Need 65% to pass</h3>
+      <p id="ftg-gate-msg"></p>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:1rem">
+      <button class="btn btn-green" id="ftg-next-btn" onclick="ftgNextAction()"></button>
+      <button class="btn btn-sm" onclick="showSection()">back to section</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SK='brvocab2:';
+function saveU(){try{localStorage.setItem(SK+user,JSON.stringify(ud));}catch(e){}}
+function loadU(u){try{const v=localStorage.getItem(SK+u);return v?JSON.parse(v):null;}catch(e){return null;}}
+
+const SECTIONS=[
+  {id:'life',title:'Life processes',emoji:'🔬',color:'#1D9E75',
+    terms:[
+      {term:'Nutrition',def:'Taking in nutrients for energy and as raw materials for growth and repair'},
+      {term:'Respiration',def:'Chemical process inside cells that releases energy from food molecules'},
+      {term:'Excretion',def:'Removal of waste products of metabolism from the body (e.g. CO₂, urea)'},
+      {term:'Sensitivity',def:'The ability to detect and respond to changes in the environment'},
+      {term:'Movement',def:'A change in position of the whole organism or part of it'},
+      {term:'Homeostasis',def:'Maintaining a constant internal environment (e.g. body temperature, water content)'},
+      {term:'Reproduction',def:'Producing offspring, either sexually or asexually'},
+      {term:'Growth',def:'A permanent increase in size and complexity during development'},
+      {term:'Stimulus',def:'A change in the environment that is detected by an organism and may trigger a response'},
+      {term:'Egestion',def:'Removal of undigested food as faeces — NOT a metabolic waste product; distinct from excretion'},
+    ],
+    ftg:[
+      {s:'___ is the removal of waste products of metabolism, such as CO₂ and urea.',b:'Excretion',d:['Egestion','Respiration','Sensitivity']},
+      {s:'___ is the removal of undigested food as faeces — it is NOT a metabolic waste product.',b:'Egestion',d:['Excretion','Nutrition','Growth']},
+      {s:'Detecting and responding to changes in the environment is called ___.',b:'Sensitivity',d:['Homeostasis','Movement','Reproduction']},
+      {s:'___ is the maintenance of a constant internal environment.',b:'Homeostasis',d:['Sensitivity','Growth','Excretion']},
+      {s:'A change in the environment that triggers a response in an organism is called a ___.',b:'Stimulus',d:['Sensitivity','Homeostasis','Nutrition']},
+      {s:'Releasing energy from food molecules inside cells is called ___.',b:'Respiration',d:['Nutrition','Photosynthesis','Growth']},
+      {s:'___ is a permanent increase in size and complexity during development.',b:'Growth',d:['Reproduction','Movement','Nutrition']},
+      {s:'Taking in nutrients for energy and raw materials is called ___.',b:'Nutrition',d:['Respiration','Excretion','Growth']},
+    ]
+  },
+  {id:'celltypes',title:'Cell types',emoji:'🔭',color:'#378ADD',
+    terms:[
+      {term:'Eukaryote',def:'An organism whose cells contain a true membrane-bound nucleus (plants, animals, fungi, protoctists)'},
+      {term:'Prokaryote',def:'An organism whose cells lack a membrane-bound nucleus; DNA is a free circular chromosome (e.g. bacteria)'},
+      {term:'Multicellular',def:'An organism made up of many cells working together'},
+      {term:'Unicellular',def:'An organism made up of a single cell only'},
+      {term:'Cell membrane',def:'The selectively permeable layer surrounding the cytoplasm that controls what enters and leaves the cell'},
+      {term:'Cytoplasm',def:'The gel-like fluid inside a cell where chemical reactions take place; found in all cells'},
+      {term:'Cell wall',def:'A rigid layer outside the cell membrane providing structural support; made of different materials in plants, fungi and bacteria'},
+      {term:'Nucleus',def:'The organelle that controls cell activities and contains the cell\'s DNA; present in eukaryotes only'},
+    ],
+    ftg:[
+      {s:'An organism whose cells contain a membrane-bound nucleus is called a ___.',b:'Eukaryote',d:['Prokaryote','Bacterium','Virus']},
+      {s:'Bacteria are ___ because their cells lack a membrane-bound nucleus.',b:'Prokaryotes',d:['Eukaryotes','Unicellular only','Multicellular']},
+      {s:'Yeast is ___ — it is made up of a single cell.',b:'Unicellular',d:['Multicellular','A prokaryote','An autotroph']},
+      {s:'The ___ is the organelle that controls cell activities and contains the cell\'s DNA.',b:'Nucleus',d:['Cell membrane','Cytoplasm','Cell wall']},
+      {s:'The ___ controls what enters and leaves the cell and is found in all living cells.',b:'Cell membrane',d:['Cell wall','Nucleus','Cytoplasm']},
+      {s:'The ___ is the gel-like fluid inside cells where chemical reactions occur.',b:'Cytoplasm',d:['Nucleus','Cell membrane','Vacuole']},
+    ]
+  },
+  {id:'plants',title:'Plants',emoji:'🌿',color:'#639922',
+    terms:[
+      {term:'Flowering plant',def:'A multicellular plant that produces flowers; cells have chloroplasts, cellulose cell walls and store carbohydrate as starch or sucrose'},
+      {term:'Cereal',def:'A type of flowering plant grown for its grain; maize is the named example in the specification'},
+      {term:'Maize',def:'The named example of a cereal (a type of flowering plant) in the specification'},
+      {term:'Herbaceous legume',def:'A non-woody flowering plant that produces seeds in pods; peas and beans are the named examples'},
+      {term:'Chloroplast',def:'An organelle in plant cells containing chlorophyll; the site of photosynthesis'},
+      {term:'Chlorophyll',def:'The green pigment inside chloroplasts that absorbs light energy for photosynthesis'},
+      {term:'Photosynthesis',def:'The process by which plants use light energy to convert CO₂ and water into glucose and oxygen'},
+      {term:'Cellulose',def:'The structural polysaccharide that makes up plant cell walls'},
+      {term:'Starch',def:'The long-term carbohydrate storage molecule in plant cells; made from glucose units'},
+      {term:'Sucrose',def:'The form in which carbohydrate is transported around the plant'},
+    ],
+    ftg:[
+      {s:'Plants store carbohydrate long-term as ___, made from glucose units.',b:'Starch',d:['Sucrose','Glycogen','Cellulose']},
+      {s:'___ is the form in which carbohydrate is transported around the plant.',b:'Sucrose',d:['Starch','Glycogen','Glucose']},
+      {s:'The green pigment in chloroplasts that absorbs light energy is ___.',b:'Chlorophyll',d:['Cellulose','Starch','Glucose']},
+      {s:'Plant cell walls are made of ___, a structural polysaccharide.',b:'Cellulose',d:['Chitin','Peptidoglycan','Starch']},
+      {s:'___ is the named example of a cereal plant in the specification.',b:'Maize',d:['Yeast','Mucor','Pea']},
+      {s:'Peas and beans are examples of ___, non-woody plants that produce seeds in pods.',b:'Herbaceous legumes',d:['Cereals','Flowering trees','Protoctists']},
+      {s:'Photosynthesis takes place inside ___, organelles found in plant cells.',b:'Chloroplasts',d:['Mitochondria','Ribosomes','Nuclei']},
+      {s:'CO₂ + water → glucose + oxygen is the equation for ___.',b:'Photosynthesis',d:['Respiration','Fermentation','Excretion']},
+    ]
+  },
+  {id:'animals',title:'Animals',emoji:'🐝',color:'#BA7517',
+    terms:[
+      {term:'Mammal',def:'A group of animals including humans — multicellular, no cell wall, no chloroplasts, often have nervous coordination'},
+      {term:'Insect',def:'A group of animals; housefly and mosquito are the named examples in the specification'},
+      {term:'Housefly',def:'A named example of an insect (animal) in the specification'},
+      {term:'Mosquito',def:'A named example of an insect; also the vector that carries and transmits Plasmodium (malaria) to humans'},
+      {term:'Glycogen',def:'The carbohydrate storage molecule in animal cells (and fungal cells); made from glucose'},
+      {term:'Nervous coordination',def:'The use of electrical impulses along nerves to detect stimuli and coordinate responses; characteristic of animals'},
+    ],
+    ftg:[
+      {s:'Animals store carbohydrate as ___ in their cells.',b:'Glycogen',d:['Starch','Sucrose','Cellulose']},
+      {s:'The use of electrical impulses along nerves to coordinate responses is called ___.',b:'Nervous coordination',d:['Homeostasis','Sensitivity','Respiration']},
+      {s:'The ___ is a named insect in the specification that is also the vector for malaria.',b:'Mosquito',d:['Housefly','Amoeba','Plasmodium']},
+      {s:'Humans are an example of a ___, a group of multicellular animals with nervous coordination.',b:'Mammal',d:['Insect','Protoctist','Fungus']},
+      {s:'The housefly and mosquito are named examples of ___ in the specification.',b:'Insects',d:['Mammals','Protoctists','Bacteria']},
+    ]
+  },
+  {id:'fungi',title:'Fungi',emoji:'🍄',color:'#7F77DD',
+    terms:[
+      {term:'Hyphae',def:'Thread-like structures that make up the body of most fungi (singular: hypha)'},
+      {term:'Mycelium',def:'The network of hyphae that forms the main body of a fungus'},
+      {term:'Chitin',def:'The structural polysaccharide that makes up fungal cell walls'},
+      {term:'Saprotrophic nutrition',def:'Feeding by secreting digestive enzymes onto food externally and absorbing the digested products'},
+      {term:'Extracellular digestion',def:'Digestion that takes place outside the organism\'s body; how fungi break down their food'},
+      {term:'Decomposer',def:'An organism that feeds on dead or decaying organic matter, breaking it down'},
+      {term:'Mucor',def:'A named example of a fungus with typical multicellular hyphal structure'},
+      {term:'Yeast',def:'A named example of a single-celled (unicellular) fungus; unusual because most fungi are multicellular'},
+    ],
+    ftg:[
+      {s:'Fungal cell walls are made of ___, not cellulose.',b:'Chitin',d:['Cellulose','Peptidoglycan','Starch']},
+      {s:'The network of thread-like hyphae forming the body of a fungus is called the ___.',b:'Mycelium',d:['Hyphae','Plasmid','Myosin']},
+      {s:'Fungi feed by secreting enzymes onto food externally — this is called ___ nutrition.',b:'Saprotrophic',d:['Holozoic','Autotrophic','Parasitic']},
+      {s:'Digestion that takes place outside the organism\'s body before absorption is called ___.',b:'Extracellular digestion',d:['Intracellular digestion','Osmosis','Respiration']},
+      {s:'___ is a named fungus with typical hyphal structure.',b:'Mucor',d:['Yeast','Amoeba','Plasmodium']},
+      {s:'___ is a unicellular fungus — unusual because most fungi are multicellular.',b:'Yeast',d:['Mucor','Chlorella','Lactobacillus']},
+      {s:'An organism that feeds on dead or decaying matter is called a ___.',b:'Decomposer',d:['Pathogen','Parasite','Producer']},
+      {s:'Thread-like structures that make up the body of most fungi are called ___.',b:'Hyphae',d:['Mycelium','Cilia','Flagella']},
+    ]
+  },
+  {id:'protoctists',title:'Protoctists',emoji:'🔬',color:'#5DCAA5',
+    terms:[
+      {term:'Protoctist',def:'A microscopic, single-celled eukaryote — some plant-like (Chlorella), some animal-like (Amoeba), some pathogenic (Plasmodium)'},
+      {term:'Amoeba',def:'A named animal-like protoctist found in pond water; moves and feeds by engulfing food particles'},
+      {term:'Chlorella',def:'A named plant-like protoctist that has chloroplasts and can photosynthesise'},
+      {term:'Plasmodium',def:'A named pathogenic protoctist that causes malaria; transmitted to humans via mosquito bites'},
+    ],
+    ftg:[
+      {s:'A ___ is a microscopic single-celled eukaryote — some are plant-like, some animal-like.',b:'Protoctist',d:['Bacterium','Virus','Fungus']},
+      {s:'___ is a plant-like protoctist with chloroplasts that can photosynthesise.',b:'Chlorella',d:['Amoeba','Plasmodium','Mucor']},
+      {s:'___ is an animal-like protoctist found in pond water that engulfs its food.',b:'Amoeba',d:['Chlorella','Plasmodium','Yeast']},
+      {s:'___ is the protoctist that causes malaria and is transmitted by mosquitoes.',b:'Plasmodium',d:['Amoeba','Chlorella','Pneumococcus']},
+    ]
+  },
+  {id:'bacteria',title:'Bacteria',emoji:'🧫',color:'#E24B4A',
+    terms:[
+      {term:'Bacterium',def:'A microscopic, single-celled prokaryote; has a cell wall, membrane, cytoplasm, circular DNA and plasmids but NO nucleus'},
+      {term:'Peptidoglycan',def:'The material that makes up bacterial cell walls (different from cellulose in plants or chitin in fungi)'},
+      {term:'Plasmid',def:'A small, circular DNA molecule in bacteria, separate from the main circular chromosome'},
+      {term:'Circular chromosome',def:'The single loop of DNA that carries bacterial genes; lies free in the cytoplasm — bacteria have NO nucleus'},
+      {term:'Lactobacillus bulgaricus',def:'A named rod-shaped bacterium used in yoghurt production from milk'},
+      {term:'Pneumococcus',def:'A named spherical bacterium that causes pneumonia'},
+    ],
+    ftg:[
+      {s:'Bacterial cell walls are made of ___, not cellulose or chitin.',b:'Peptidoglycan',d:['Cellulose','Chitin','Glycogen']},
+      {s:'A small circular DNA molecule in bacteria, separate from the main chromosome, is called a ___.',b:'Plasmid',d:['Circular chromosome','Nucleus','Ribosome']},
+      {s:'Bacteria carry their genetic material as a free ___ in the cytoplasm — they have no nucleus.',b:'Circular chromosome',d:['Plasmid','Nucleus','Linear chromosome']},
+      {s:'___ is the named rod-shaped bacterium used in yoghurt production.',b:'Lactobacillus bulgaricus',d:['Pneumococcus','Plasmodium','Mucor']},
+      {s:'___ is the named spherical bacterium that causes pneumonia.',b:'Pneumococcus',d:['Lactobacillus bulgaricus','Plasmodium','HIV']},
+      {s:'Unlike eukaryotes, bacteria have no ___ — their DNA floats free in the cytoplasm.',b:'Nucleus',d:['Cell wall','Cell membrane','Cytoplasm']},
+    ]
+  },
+  {id:'pathogens',title:'Pathogens & Viruses',emoji:'🦠',color:'#D85A30',
+    terms:[
+      {term:'Pathogen',def:'Any organism or particle that causes disease; can be a fungus, bacterium, protoctist or virus'},
+      {term:'Virus',def:'A non-living particle with a protein coat containing one type of nucleic acid (DNA or RNA); replicates only inside a living host cell'},
+      {term:'Parasitic',def:'Depending on a living host to survive and reproduce, often harming the host; viruses are parasitic'},
+      {term:'Protein coat',def:'The outer layer of a virus (capsid) that surrounds and protects its nucleic acid'},
+      {term:'Host cell',def:'The living cell a virus invades and uses to replicate; viruses cannot reproduce without a host cell'},
+      {term:'Nucleic acid',def:'The genetic material inside a virus — either DNA or RNA (never both)'},
+      {term:'Vector',def:'An organism that carries and transmits a pathogen to another organism without being harmed itself; the mosquito is the vector for Plasmodium'},
+      {term:'Tobacco mosaic virus',def:'A named plant virus containing RNA that prevents chloroplast formation, causing mosaic discolouration of tobacco leaves'},
+      {term:'HIV',def:'Human Immunodeficiency Virus — a named virus containing RNA that causes AIDS'},
+      {term:'Malaria',def:'A disease caused by the protoctist Plasmodium, transmitted to humans via mosquito bites'},
+      {term:'Pneumonia',def:'A lung disease caused by the bacterium Pneumococcus'},
+      {term:'AIDS',def:'Acquired Immunodeficiency Syndrome — the disease caused by HIV; severely weakens the immune system'},
+    ],
+    ftg:[
+      {s:'A ___ is any organism or particle that causes disease.',b:'Pathogen',d:['Vector','Host cell','Decomposer']},
+      {s:'Viruses are ___ — they depend on a living host cell to replicate and often harm it.',b:'Parasitic',d:['Saprotrophic','Autotrophic','Holozoic']},
+      {s:'The outer layer of a virus that surrounds its nucleic acid is called the ___.',b:'Protein coat',d:['Cell membrane','Cell wall','Mycelium']},
+      {s:'A virus can only replicate inside a living ___ — it cannot reproduce independently.',b:'Host cell',d:['Protein coat','Nucleus','Plasmid']},
+      {s:'The genetic material inside a virus is ___ — either DNA or RNA, never both.',b:'Nucleic acid',d:['Protein','Cellulose','Plasmid']},
+      {s:'An organism that carries and transmits a pathogen without being harmed is called a ___.',b:'Vector',d:['Pathogen','Host cell','Decomposer']},
+      {s:'___ is a named plant virus that prevents chloroplast formation in tobacco plants.',b:'Tobacco mosaic virus',d:['HIV','Influenza virus','Plasmodium']},
+      {s:'HIV causes the disease called ___.',b:'AIDS',d:['Malaria','Pneumonia','Influenza']},
+      {s:'___ is caused by the protoctist Plasmodium, transmitted via mosquito bites.',b:'Malaria',d:['AIDS','Pneumonia','Influenza']},
+      {s:'___ is a lung disease caused by the spherical bacterium Pneumococcus.',b:'Pneumonia',d:['Malaria','AIDS','Influenza']},
+    ]
+  }
+];
+
+// ── State ─────────────────────────────────────────────────
+let user=null,ud=null,curSecIdx=0;
+let fcTerms=[],fcIdx=0,
